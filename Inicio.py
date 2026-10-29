@@ -3,6 +3,7 @@ import paho.mqtt.client as mqtt
 import json
 import time
 import uuid
+from pathlib import Path
 
 # Configuración de la página
 st.set_page_config(
@@ -93,6 +94,13 @@ with st.sidebar:
 # Título
 st.title('📡 Lector de Sensor MQTT')
 
+# Imagen debajo del título
+img_path = Path(__file__).parent / 'gatomqtt.jpg'
+if img_path.exists():
+    st.image(str(img_path), use_container_width=True)
+else:
+    st.warning('⚠️ No se encontró la imagen gatomqtt.jpg en el repositorio.')
+
 # Información al inicio
 with st.expander('ℹ️ Información', expanded=False):
     st.markdown("""
@@ -144,5 +152,5 @@ if st.session_state.sensor_data is not None:
             with st.expander('Ver JSON completo'):
                 st.json(data)
         else:
-            # Si no es diccionario, mostrar como texto
+            # Si no es dict, mostrar como texto
             st.code(data)
