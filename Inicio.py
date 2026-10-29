@@ -17,6 +17,14 @@ if 'sensor_data' not in st.session_state:
     st.session_state.sensor_data = None
 
 
+def mostrar_imagen(ruta):
+    """Muestra una imagen ocupando el ancho disponible (compatible con versiones viejas y nuevas)."""
+    try:
+        st.image(ruta, use_container_width=True)
+    except TypeError:
+        st.image(ruta, use_column_width=True)
+
+
 def get_mqtt_message(broker, port, topic, client_id, wait_seconds=10):
     """Se conecta al broker, se suscribe al tópico y espera un mensaje."""
     message_received = {"received": False, "payload": None}
@@ -97,7 +105,7 @@ st.title('📡 Lector de Sensor MQTT')
 # Imagen debajo del título
 img_path = Path(__file__).parent / 'gatomqtt.jpg'
 if img_path.exists():
-    st.image(str(img_path), use_container_width=True)
+    mostrar_imagen(str(img_path))
 else:
     st.warning('⚠️ No se encontró la imagen gatomqtt.jpg en el repositorio.')
 
@@ -120,8 +128,13 @@ with st.expander('ℹ️ Información', expanded=False):
 
 st.divider()
 
-# Botón para obtener datos
-if st.button('🔄 Obtener Datos del Sensor', use_container_width=True):
+# Botón para obtener datos (compatible con versiones viejas y nuevas)
+try:
+    boton = st.button('🔄 Obtener Datos del Sensor', use_container_width=True)
+except TypeError:
+    boton = st.button('🔄 Obtener Datos del Sensor')
+
+if boton:
     with st.spinner('Conectando al broker y esperando datos...'):
         sensor_data = get_mqtt_message(broker, int(port), topic, client_id)
         st.session_state.sensor_data = sensor_data
@@ -152,5 +165,5 @@ if st.session_state.sensor_data is not None:
             with st.expander('Ver JSON completo'):
                 st.json(data)
         else:
-            # Si no es dict, mostrar como texto
+            # Si no es diccionario, mostrar como texto
             st.code(data)
